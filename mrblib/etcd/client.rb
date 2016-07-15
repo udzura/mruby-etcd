@@ -77,9 +77,13 @@ module Etcd
       do_request("/keys/#{key}", :delete)
     end
 
-    def wait(key)
+    def wait(key, recursive=false)
+      if !recursive and dir?(key)
+        raise "Directory TTL is not yet supported, so must be recursive=true when watching directory: /#{key}"
+      end
       chunk = nil
-      res = @httpcli.get("#{@endpoint}/keys/#{key}?wait=true", {}, default_get_headers) do |data|
+      params = recursive ? "wait=true&recursive=true" : "wait=true"
+      res = @httpcli.get("#{@endpoint}/keys/#{key}?#{params}", {}, default_get_headers) do |data|
         chunk = SimpleHttp::SimpleHttpResponse.new(data)
       end
       if res && chunk
@@ -87,6 +91,11 @@ module Etcd
       else
         raise "Something is wrong when long-polling"
       end
+    end
+
+    def dir?(key_or_dir)
+      target = get(key_or_dir, true)
+      !! target["node"]["dir"]
     end
 
     def members(raw=true)
