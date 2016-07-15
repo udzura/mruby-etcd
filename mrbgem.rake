@@ -4,6 +4,6 @@ MRuby::Gem::Specification.new('mruby-etcd') do |spec|
   spec.version = "0.1.0"
   spec.summary = 'Simple etcd API implementation'
 
-  spec.add_dependency 'mruby-httprequest', :mgem => 'mruby-httprequest'
-  spec.add_dependency 'mruby-json',        :mgem => 'mruby-json'
+  spec.add_dependency 'mruby-httprequest'
+  spec.add_dependency 'mruby-json'
 end
