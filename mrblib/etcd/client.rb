@@ -25,7 +25,7 @@ module Etcd
       when :get
         res = @httpcli.get(url, {}, default_get_headers.merge(headers), &b)
       when :post
-        res = @httpcli.post(url, default_post_headers.merge(headers), headers)
+        res = @httpcli.post(url, body, default_post_headers.merge(headers), headers)
       when :put
         res = @httpcli.put(url, body, default_post_headers.merge(headers))
       when :delete
@@ -87,6 +87,40 @@ module Etcd
       else
         raise "Something is wrong when long-polling"
       end
+    end
+
+    def members(raw=true)
+      res = do_request("/members", :get)
+      if raw
+        res
+      else
+        res["members"]
+      end
+    end
+
+    def add_member(peer_urls=[], raise_on_fail=false)
+      url = "#{@endpoint}/members"
+      headers = default_get_headers.merge({'Content-Type' => 'application/json'})
+      body = {"peerURLs" => peer_urls}.to_json
+      res = @httpcli.post(url, body, default_post_headers.merge(headers))
+      if res.code == 201 or res.code == 200
+        JSON.parse(res.body)
+      elsif raise_on_fail
+        raise "Adding member failed: status=#{res.code}, #{JSON.parse(res.body).inspect}"
+      else
+        return res
+      end
+    end
+
+    def delete_member(id)
+      do_request("/members/#{id}", :delete)
+    end
+
+    def join(peer_api_endpoint, raise_on_fail=false)
+      peer = Etcd::Client.new(peer_api_endpoint)
+      self_id = stats["id"]
+      self_endpoint = members(false).find{|m| m["id"] == self_id }["peerURLs"].first
+      peer.add_member([self_endpoint], raise_on_fail)
     end
 
     def current_leader
