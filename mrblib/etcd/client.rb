@@ -4,6 +4,7 @@ module Etcd
       @endpoint = endpoint || Etcd.endpoint
       @httpcli = HttpRequest.new()
     end
+    attr_reader :endpoint
 
     def default_get_headers
       @default_headers ||= {
@@ -19,7 +20,7 @@ module Etcd
     end
 
     def do_request(path, meth=:get, body={}, headers={}, &b)
-      url = "#{@endpoint}#{path}"
+      url = "#{endpoint}#{path}"
       res = nil
       case meth
       when :get
@@ -83,7 +84,7 @@ module Etcd
       end
       chunk = nil
       params = recursive ? "wait=true&recursive=true" : "wait=true"
-      res = @httpcli.get("#{@endpoint}/keys/#{key}?#{params}", {}, default_get_headers) do |data|
+      res = @httpcli.get("#{endpoint}/keys/#{key}?#{params}", {}, default_get_headers) do |data|
         chunk = SimpleHttp::SimpleHttpResponse.new(data)
       end
       if res && chunk
@@ -108,7 +109,7 @@ module Etcd
     end
 
     def add_member(peer_urls=[], raise_on_fail=false)
-      url = "#{@endpoint}/members"
+      url = "#{endpoint}/members"
       headers = default_get_headers.merge({'Content-Type' => 'application/json'})
       body = {"peerURLs" => peer_urls}.to_json
       res = @httpcli.post(url, body, default_post_headers.merge(headers))

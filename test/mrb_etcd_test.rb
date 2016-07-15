@@ -1,17 +1,4 @@
-##
-## Etcd Test
-##
-
-assert("Etcd#hello") do
-  t = Etcd.new "hello"
-  assert_equal("hello", t.hello)
-end
-
-assert("Etcd#bye") do
-  t = Etcd.new "hello"
-  assert_equal("hello bye", t.bye)
-end
-
-assert("Etcd.hi") do
-  assert_equal("hi!!", Etcd.hi)
+assert("Etcd::Client.new") do
+  c = Etcd::Client.new
+  assert_equal("http://127.0.0.1:2379/v2", c.endpoint)
 end
