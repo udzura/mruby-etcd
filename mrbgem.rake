@@ -5,5 +5,5 @@ MRuby::Gem::Specification.new('mruby-etcd') do |spec|
   spec.summary = 'Simple etcd API implementation'
 
   spec.add_dependency 'mruby-httprequest', :mgem => 'mruby-httprequest'
-  spec.add_dependency 'mruby-iijson',      :mgem => 'mruby-iijson'
+  spec.add_dependency 'mruby-iijson',      :github => 'udzura/mruby-iijson', :branch => 'patch-1'
 end
