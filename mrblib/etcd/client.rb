@@ -49,6 +49,7 @@ module Etcd
     def get(key, raw=false)
       res = do_request("/keys/#{key}", :get)
       if res.is_a?(Hash)
+        return nil if res["errorCode"] == 100
         raw ? res : res['node']['value']
       else
         res
@@ -64,6 +65,7 @@ module Etcd
         raise "/keys/#{dir} is not a directory"
       end
       if raw
+        return [] if res["errorCode"] == 100
         res
       else
         res['node']['nodes']
