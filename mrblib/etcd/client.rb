@@ -61,7 +61,7 @@ module Etcd
       unless res.is_a?(Hash)
         raise "Something is wrong with /keys/#{dir}: #{res.inspect}"
       end
-      unless res['node']['dir'] == true
+      if !res["errorCode"] and !res['node']['dir']
         raise "/keys/#{dir} is not a directory"
       end
       if raw
