@@ -65,9 +65,9 @@ module Etcd
         raise "/keys/#{dir} is not a directory"
       end
       if raw
-        return [] if res["errorCode"] == 100
         res
       else
+        return [] if res["errorCode"] == 100
         res['node']['nodes']
       end
     end
