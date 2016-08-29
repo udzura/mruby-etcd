@@ -80,12 +80,15 @@ module Etcd
       do_request("/keys/#{key}", :delete)
     end
 
-    def wait(key, recursive=false)
+    def wait(key, recursive=false, options={})
       if !recursive and dir?(key)
         raise "Directory TTL is not yet supported, so must be recursive=true when watching directory: /#{key}"
       end
       chunk = nil
       params = recursive ? "wait=true&recursive=true" : "wait=true"
+      if wait_index = options[:wait_index]
+        params += "&waitIndex=#{wait_index}"
+      end
       res = @httpcli.get("#{endpoint}/keys/#{key}?#{params}", {}, default_get_headers) do |data|
         chunk = SimpleHttp::SimpleHttpResponse.new(data)
       end
